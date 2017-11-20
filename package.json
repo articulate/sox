@@ -1,0 +1,15 @@
+{
+  "name": "@articulate/sox",
+  "version": "0.0.0",
+  "description": "Our super-special sockets stuff",
+  "main": "index.js",
+  "repository": "git@github.com:articulate/sox.git",
+  "author": "articulate",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@articulate/ducks": "^0.1.0",
+    "crocks": "^0.8.1",
+    "cuid": "^1.3.8",
+    "socket.io-client": "^2.0.4"
+  }
+}
