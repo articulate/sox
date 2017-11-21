@@ -4,6 +4,8 @@ const cuid   = require('cuid')
 const curry  = require('ramda/src/curry')
 const evolve = require('ramda/src/evolve')
 const io     = require('socket.io-client')
+const pick   = require('ramda/src/pick')
+const URL    = require('url')
 
 const debounce = require('./debounce')
 const throttle = require('./throttle')
@@ -16,9 +18,18 @@ const key = curry((type, payload) =>
 const reload = () =>
   window.location.reload(true)
 
-const sox = opts => {
+const sox = ({ uri='' }) => {
   const session = cuid()
-  const socket  = io({ autoConnect: false, query: { session } })
+  const url     = URL.parse(uri)
+  const base    = URL.format(pick(['protocol', 'slashes', 'host'], url))
+
+  const opts = {
+    autoConnect: false,
+    path: url.pathname,
+    query: { session }
+  }
+
+  const socket = io(base, opts)
 
   const emit = curry((type, payload, done) =>
     socket.emit('action', action(type, payload), done)
