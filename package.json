@@ -2,7 +2,8 @@
   "name": "@articulate/sox",
   "version": "0.0.0",
   "description": "Our super-special sockets stuff",
-  "main": "lib/sox.js",
+  "browser": "dist/sox.js",
+  "main": "server/sox.js",
   "repository": "git@github.com:articulate/sox.git",
   "author": "articulate",
   "license": "UNLICENSED",
@@ -14,10 +15,10 @@
     "branches": 100
   },
   "scripts": {
-    "build": "buble -i src -o lib",
-    "clean": "rm -rf lib && mkdir -p lib",
+    "build": "buble -i client -o dist",
+    "clean": "rm -rf dist && mkdir -p dist",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "lint": "eslint src test",
+    "lint": "eslint client server test",
     "postversion": "git push --tags origin master",
     "prebuild": "yarn run clean",
     "pretest": "yarn run build",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "@articulate/ducks": "^0.1.0",
+    "boom": "^5.2.0",
     "crocks": "^0.8.1",
     "cuid": "^1.3.8",
     "ramda": "^0.25.0",
