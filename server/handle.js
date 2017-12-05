@@ -1,11 +1,22 @@
-const {
-  append, apply, compose, curry, identity, map, pipe, tap
-} = require('ramda')
+const { compose, curry, identity, map, pipe, tap } = require('ramda')
 
 const { action, error } = require('@articulate/ducks')
 const { reject }        = require('@articulate/funky')
 
 const fromError = require('./fromError')
+
+const calm = curry((next, data) =>
+  Promise.resolve(data)
+    .then(next)
+    .catch(identity)
+)
+
+const handle = ({ middleware=[] }) => {
+  const flow = compose(calm, ...middleware, send)
+
+  // handle : { k: (a -> Promise b) } -> (Action, Function) -> Promise Action
+  return compose(handleWith, map(flow))
+}
 
 const handleWith = handlers => ({ type, payload }, respond=identity) =>
   handlers[type] && handlers[type]({ type, payload, respond })
@@ -25,11 +36,4 @@ const send = curry((next, { type, payload, respond }) =>
     ))
 )
 
-const sox = ({ middleware=[] }={}) => {
-  const flow = apply(compose)(append(send, middleware))
-
-  // handle : { k: (a -> Promise b) } -> (Action, Function) -> Promise Action
-  return compose(handleWith, map(flow))
-}
-
-module.exports = sox
+module.exports = handle

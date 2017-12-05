@@ -15,9 +15,6 @@ const key = curry((type, payload) =>
   `${type}/${payload.id}`
 )
 
-const reload = () =>
-  window.location.reload(true)
-
 const sox = ({ uri='' }) => {
   const session = cuid()
   const url     = URL.parse(uri)
@@ -57,8 +54,6 @@ const sox = ({ uri='' }) => {
   socket.throttle = curry((wait, type) =>
     throttle(wait, key(type), send(type))
   )
-
-  socket.on('hard-reload', reload)
 
   return socket
 }
