@@ -15,7 +15,7 @@ const key = curry((type, payload) =>
   `${type}/${payload.id}`
 )
 
-const sox = ({ uri='' }) => {
+const sox = ({ uri='' }={}) => {
   const session = cuid()
   const url     = URL.parse(uri)
   const base    = URL.format(pick(['protocol', 'slashes', 'host'], url))

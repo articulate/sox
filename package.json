@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "buble -i client -o dist",
-    "clean": "rm -rf dist && mkdir -p dist",
+    "clean": "rm -rf dist/* && mkdir -p dist",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint client server test",
     "postversion": "git push --tags origin master",
