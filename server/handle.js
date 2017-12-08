@@ -25,7 +25,7 @@ const send = curry((next, { type, payload, respond }) =>
   Promise.resolve(payload)
     .then(next)
     .then(action(type))
-    .then(respond)
+    .then(tap(respond))
     .catch(pipe(
       tap(pipe(
         fromError,
