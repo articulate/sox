@@ -3,4 +3,4 @@
 
 Our super-special sockets stuff.
 
-See the [documentation](https://github.com/articulate/sox/blob/master/API.md) for details and examples.
+See the [client](https://github.com/articulate/sox/blob/master/docs/client.md) and [server](https://github.com/articulate/sox/blob/master/docs/server.md) documentation for details and examples.
