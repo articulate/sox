@@ -5,7 +5,8 @@
 .gitignore
 .yarn*
 /.nyc_output
+/client
+/docs
 /node_modules
-/src
 /test
 yarn.lock
