@@ -53,7 +53,7 @@ Note that it's best to re-reject any caught errors, so that other middleware can
 ### handle
 
 ```haskell
-handle : { k: (a -> Promise b) } -> (Action, Function) -> Promise b
+handle :: { k: (a -> Promise b) } -> (Action, Function) -> Promise b
 ```
 
 Accepts a mapping of [FSA-compliant](https://github.com/acdlite/flux-standard-action) action types to unary handler functions.  Returns a `socket.io` callback.  Lifts each handler into a `Promise` chain and wraps it with the [supplied middleware](#setup).
@@ -86,7 +86,7 @@ module.exports = (socket, next) => {
 ### join
 
 ```haskell
-join : Socket -> (a -> String) -> a -> a
+join :: Socket -> (a -> String) -> a -> a
 ```
 
 Accepts a `socket` and a room function.  The room function is used to translate the incoming `payload` into a room identifier.  The `socket` is then [joined to the room](http://devdocs.io/socketio/rooms-and-namespaces#rooms), and the `payload` is passed through.
@@ -120,7 +120,7 @@ module.exports = (socket, next) => {
 ### leave
 
 ```haskell
-leave : Socket -> (a -> String) -> a -> a
+leave :: Socket -> (a -> String) -> a -> a
 ```
 
 Accepts a `socket` and a room function.  The room function is used to translate the incoming `payload` into a room identifier.  The `socket` is then [removed from the room](http://devdocs.io/socketio/rooms-and-namespaces#rooms), and the `payload` is passed through.
@@ -154,7 +154,7 @@ module.exports = (socket, next) => {
 ### to
 
 ```haskell
-to : Socket -> (a -> String) -> String -> a -> a
+to :: Socket -> (a -> String) -> String -> a -> a
 ```
 
 Accepts a `socket`, a room function, and an [FSA-compliant](https://github.com/acdlite/flux-standard-action) action `type`.  The room function is used to translate the incoming `payload` into a room identifier.  An `'action'` event with an action of `{ type, payload }` is then broadcast to all sockets.  Finally, the `payload` is passed through.
