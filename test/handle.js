@@ -36,10 +36,10 @@ describe('handle', () => {
   }
 
   const handler = handle({
+    BAD_REQUEST: badRequest,
     GET_USER:  get,
     NOT_FOUND: notFound,
-    PUT_USER:  put,
-    BAD_REQUEST: badRequest
+    PUT_USER:  put
   })
 
   beforeEach(() =>
@@ -112,10 +112,10 @@ describe('handle', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'NOT_FOUND',
         payload: {
+          data: undefined,
           message: 'Not Found',
           name: 'Not Found',
           status: 404,
-          data: undefined,
         },
         error: true
       })
@@ -134,10 +134,10 @@ describe('handle', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'BAD_REQUEST',
         payload: {
+          data: { foo: 'bar' },
           message: 'Bad Request',
           name: 'Bad Request',
           status: 400,
-          data: { foo: 'bar' }
         },
         error: true
       })

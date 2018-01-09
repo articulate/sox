@@ -1,8 +1,8 @@
-const toError = ({ message, name, status, data }) => {
+const toError = ({ data, message, name, status }) => {
   const err = new Error(message)
+  err.data = data
   err.name = name
   err.status = status
-  err.data = data
   return err
 }
 

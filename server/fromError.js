@@ -1,8 +1,8 @@
 const { boomify } = require('boom')
 const { path, pipe, prop, unless } = require('ramda')
 
-const formatError = ({ message, error: name, statusCode: status, data }) =>
-  ({ message, name, status, data })
+const formatError = ({ data, message, error: name, statusCode: status }) =>
+  ({ data, message, name, status })
 
 const fromError = pipe(
   unless(prop('isBoom'), boomify),
