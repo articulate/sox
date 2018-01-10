@@ -1,6 +1,6 @@
 {
   "name": "@articulate/sox",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Our super-special sockets stuff",
   "browser": "dist/index.js",
   "main": "server/index.js",
