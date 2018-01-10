@@ -29,7 +29,14 @@ describe('handle', () => {
     throw Boom.notFound()
   }
 
+  const badRequest = () => {
+    const err = Boom.badRequest()
+    err.output.payload.data = { foo: 'bar' }
+    throw err
+  }
+
   const handler = handle({
+    BAD_REQUEST: badRequest,
     GET_USER:  get,
     NOT_FOUND: notFound,
     PUT_USER:  put
@@ -105,9 +112,32 @@ describe('handle', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'NOT_FOUND',
         payload: {
+          data: undefined,
           message: 'Not Found',
           name: 'Not Found',
-          status: 404
+          status: 404,
+        },
+        error: true
+      })
+    )
+  })
+
+  describe('when it fails with data', () => {
+    const notFound = action('BAD_REQUEST', null)
+    const respond  = spy()
+
+    beforeEach(() =>
+      handler(notFound, respond)
+    )
+
+    it('responds with an error action', () =>
+      expect(respond.calls[0][0]).to.eql({
+        type: 'BAD_REQUEST',
+        payload: {
+          data: { foo: 'bar' },
+          message: 'Bad Request',
+          name: 'Bad Request',
+          status: 400,
         },
         error: true
       })
