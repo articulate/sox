@@ -3,9 +3,11 @@ const Boom       = require('boom')
 const { expect } = require('chai')
 const property   = require('prop-factory')
 const spy        = require('@articulate/spy')
+const { createSandbox, match } = require('sinon')
 
 const { assoc, curry } = require('ramda')
 
+const sandbox = createSandbox()
 const log = property()
 
 const logging = curry((next, data) =>
@@ -35,22 +37,36 @@ describe('handle', () => {
     throw err
   }
 
+  const horribleError = () => {
+    throw new Error('foobar')
+  }
+
   const handler = handle({
     BAD_REQUEST: badRequest,
     GET_USER:  get,
+    HORRIBLE_ERROR: horribleError,
     NOT_FOUND: notFound,
-    PUT_USER:  put
+    PUT_USER:  put,
   })
 
-  beforeEach(() =>
+  before(() =>
+    sandbox.stub(console, 'error')
+  )
+
+  beforeEach(() => {
     db = {
       a: { id: 'a', name: 'Johny', flag: true },
       b: { id: 'b', name: 'Katie', flag: true }
     }
-  )
+  })
 
-  afterEach(() =>
+  afterEach(() => {
     log(undefined)
+    sandbox.resetHistory()
+  })
+
+  after(() =>
+    console.error.restore()
   )
 
   describe('when socket.io wants a response', () => {
@@ -77,12 +93,13 @@ describe('handle', () => {
       handler(putUser).then(res)
     )
 
-    it('that\'s ok too', () =>
+    it('that\'s ok too', () => {
       expect(res()).to.eql({
         type: 'PUT_USER',
         payload: { id: 'c', name: 'Bobby', flag: true }
       })
-    )
+      expect(console.error).not.to.have.been.called
+    })
   })
 
   describe('with middleware supplied', () => {
@@ -92,12 +109,13 @@ describe('handle', () => {
       handler(getUser)
     )
 
-    it('runs the middleware', () =>
+    it('runs the middleware', () => {
       expect(log()).to.eql({
         type: 'GET_USER',
         payload: { id: 'a', name: 'Johny', flag: true }
       })
-    )
+      expect(console.error).not.to.have.been.called
+    })
   })
 
   describe('when it fails', () => {
@@ -108,7 +126,7 @@ describe('handle', () => {
       handler(notFound, respond)
     )
 
-    it('responds with an error action', () =>
+    it('responds with an error action', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'NOT_FOUND',
         payload: {
@@ -119,7 +137,10 @@ describe('handle', () => {
         },
         error: true
       })
-    )
+      expect(console.error).to.have.been.calledOnce
+        .and.to.have.been.calledWith(match(Error))
+        .and.to.have.been.calledWith(match({ message: 'Not Found' }))
+    })
   })
 
   describe('when it fails with data', () => {
@@ -130,7 +151,7 @@ describe('handle', () => {
       handler(notFound, respond)
     )
 
-    it('responds with an error action', () =>
+    it('responds with an error action', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'BAD_REQUEST',
         payload: {
@@ -141,6 +162,34 @@ describe('handle', () => {
         },
         error: true
       })
+      expect(console.error).to.have.been.calledOnce
+        .and.to.have.been.calledWith(match(Error))
+        .and.to.have.been.calledWith(match({ message: 'Bad Request' }))
+    })
+  })
+
+  describe('when it fails with generic `Error`', () => {
+    const notFound = action('HORRIBLE_ERROR', null)
+    const respond  = spy()
+
+    beforeEach(() =>
+      handler(notFound, respond)
     )
+
+    it('responds with an error action', () => {
+      expect(respond.calls[0][0]).to.eql({
+        type: 'HORRIBLE_ERROR',
+        payload: {
+          data: undefined,
+          message: 'An internal server error occurred',
+          name: 'Internal Server Error',
+          status: 500,
+        },
+        error: true
+      })
+      expect(console.error).to.have.been.calledOnce
+        .and.to.have.been.calledWith(match(Error))
+        .and.to.have.been.calledWith(match({ message: 'foobar' }))
+    })
   })
 })

@@ -8,7 +8,7 @@ const fromError = require('./fromError')
 const calm = curry((next, data) =>
   Promise.resolve(data)
     .then(next)
-    .catch(identity)
+    .catch(console.error.bind(console))
 )
 
 const handle = ({ middleware=[] }) => {
