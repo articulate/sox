@@ -1,4 +1,4 @@
-const { compose, curry, identity, map, pipe, tap } = require('ramda')
+const { compose, curry, identity, map, pick, pipe, tap } = require('ramda')
 
 const { action, error } = require('@articulate/ducks')
 const { reject }        = require('@articulate/funky')
@@ -8,7 +8,11 @@ const fromError = require('./fromError')
 const calm = curry((next, data) =>
   Promise.resolve(data)
     .then(next)
-    .catch(console.error.bind(console))
+    .catch(pipe(
+      pick([ 'message', 'name', 'stack' ]),
+      JSON.stringify,
+      console.error
+    ))
 )
 
 const handle = ({ middleware=[] }) => {
