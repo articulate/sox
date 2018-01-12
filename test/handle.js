@@ -19,6 +19,8 @@ const { handle } = require('..')({ middleware: [ logging ] })
 describe('handle', () => {
   let db
 
+  const restoreError = console.error
+
   const get = data =>
     db[data.id]
 
@@ -35,23 +37,30 @@ describe('handle', () => {
     throw err
   }
 
+  const horribleError = () => {
+    throw new Error('foobar')
+  }
+
   const handler = handle({
     BAD_REQUEST: badRequest,
     GET_USER:  get,
+    HORRIBLE_ERROR: horribleError,
     NOT_FOUND: notFound,
-    PUT_USER:  put
+    PUT_USER:  put,
   })
 
-  beforeEach(() =>
+  beforeEach(() => {
+    console.error = spy()
     db = {
       a: { id: 'a', name: 'Johny', flag: true },
       b: { id: 'b', name: 'Katie', flag: true }
     }
-  )
+  })
 
-  afterEach(() =>
+  afterEach(() => {
     log(undefined)
-  )
+    console.error = restoreError
+  })
 
   describe('when socket.io wants a response', () => {
     const getUser = action('GET_USER', { id: 'a' })
@@ -77,12 +86,13 @@ describe('handle', () => {
       handler(putUser).then(res)
     )
 
-    it('that\'s ok too', () =>
+    it('that\'s ok too', () => {
       expect(res()).to.eql({
         type: 'PUT_USER',
         payload: { id: 'c', name: 'Bobby', flag: true }
       })
-    )
+      expect(console.error.calls.length).to.equal(0)
+    })
   })
 
   describe('with middleware supplied', () => {
@@ -92,12 +102,13 @@ describe('handle', () => {
       handler(getUser)
     )
 
-    it('runs the middleware', () =>
+    it('runs the middleware', () => {
       expect(log()).to.eql({
         type: 'GET_USER',
         payload: { id: 'a', name: 'Johny', flag: true }
       })
-    )
+      expect(console.error.calls.length).to.equal(0)
+    })
   })
 
   describe('when it fails', () => {
@@ -108,7 +119,7 @@ describe('handle', () => {
       handler(notFound, respond)
     )
 
-    it('responds with an error action', () =>
+    it('responds with an error action', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'NOT_FOUND',
         payload: {
@@ -119,7 +130,13 @@ describe('handle', () => {
         },
         error: true
       })
-    )
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      const err = JSON.parse(console.error.calls[0][0])
+      expect(err).to.have.property('name', 'Error')
+      expect(err).to.have.property('message', 'Not Found')
+      expect(err).to.have.property('stack').that.is.a('string')
+    })
   })
 
   describe('when it fails with data', () => {
@@ -130,7 +147,7 @@ describe('handle', () => {
       handler(notFound, respond)
     )
 
-    it('responds with an error action', () =>
+    it('responds with an error action', () => {
       expect(respond.calls[0][0]).to.eql({
         type: 'BAD_REQUEST',
         payload: {
@@ -141,6 +158,40 @@ describe('handle', () => {
         },
         error: true
       })
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      const err = JSON.parse(console.error.calls[0][0])
+      expect(err).to.have.property('name', 'Error')
+      expect(err).to.have.property('message', 'Bad Request')
+      expect(err).to.have.property('stack').that.is.a('string')
+    })
+  })
+
+  describe('when it fails with generic `Error`', () => {
+    const notFound = action('HORRIBLE_ERROR', null)
+    const respond  = spy()
+
+    beforeEach(() =>
+      handler(notFound, respond)
     )
+
+    it('responds with an error action', () => {
+      expect(respond.calls[0][0]).to.eql({
+        type: 'HORRIBLE_ERROR',
+        payload: {
+          data: undefined,
+          message: 'An internal server error occurred',
+          name: 'Internal Server Error',
+          status: 500,
+        },
+        error: true
+      })
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      const err = JSON.parse(console.error.calls[0][0])
+      expect(err).to.have.property('name', 'Error')
+      expect(err).to.have.property('message', 'foobar')
+      expect(err).to.have.property('stack').that.is.a('string')
+    })
   })
 })
