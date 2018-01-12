@@ -3,11 +3,9 @@ const Boom       = require('boom')
 const { expect } = require('chai')
 const property   = require('prop-factory')
 const spy        = require('@articulate/spy')
-const { createSandbox, match } = require('sinon')
 
 const { assoc, curry } = require('ramda')
 
-const sandbox = createSandbox()
 const log = property()
 
 const logging = curry((next, data) =>
@@ -19,7 +17,7 @@ const logging = curry((next, data) =>
 const { handle } = require('..')({ middleware: [ logging ] })
 
 describe('handle', () => {
-  let db
+  let db, restoreError
 
   const get = data =>
     db[data.id]
@@ -49,11 +47,9 @@ describe('handle', () => {
     PUT_USER:  put,
   })
 
-  before(() =>
-    sandbox.stub(console, 'error')
-  )
-
   beforeEach(() => {
+    restoreError = console.error
+    console.error = spy()
     db = {
       a: { id: 'a', name: 'Johny', flag: true },
       b: { id: 'b', name: 'Katie', flag: true }
@@ -62,12 +58,8 @@ describe('handle', () => {
 
   afterEach(() => {
     log(undefined)
-    sandbox.resetHistory()
+    console.error = restoreError
   })
-
-  after(() =>
-    console.error.restore()
-  )
 
   describe('when socket.io wants a response', () => {
     const getUser = action('GET_USER', { id: 'a' })
@@ -98,7 +90,7 @@ describe('handle', () => {
         type: 'PUT_USER',
         payload: { id: 'c', name: 'Bobby', flag: true }
       })
-      expect(console.error).not.to.have.been.called
+      expect(console.error.calls.length).to.equal(0)
     })
   })
 
@@ -114,7 +106,7 @@ describe('handle', () => {
         type: 'GET_USER',
         payload: { id: 'a', name: 'Johny', flag: true }
       })
-      expect(console.error).not.to.have.been.called
+      expect(console.error.calls.length).to.equal(0)
     })
   })
 
@@ -137,9 +129,10 @@ describe('handle', () => {
         },
         error: true
       })
-      expect(console.error).to.have.been.calledOnce
-        .and.to.have.been.calledWith(match(Error))
-        .and.to.have.been.calledWith(match({ message: 'Not Found' }))
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      expect(console.error.calls[0][0]).to.be.instanceOf(Error)
+        .and.to.have.property('message', 'Not Found')
     })
   })
 
@@ -162,9 +155,10 @@ describe('handle', () => {
         },
         error: true
       })
-      expect(console.error).to.have.been.calledOnce
-        .and.to.have.been.calledWith(match(Error))
-        .and.to.have.been.calledWith(match({ message: 'Bad Request' }))
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      expect(console.error.calls[0][0]).to.be.instanceOf(Error)
+        .and.to.have.property('message', 'Bad Request')
     })
   })
 
@@ -187,9 +181,10 @@ describe('handle', () => {
         },
         error: true
       })
-      expect(console.error).to.have.been.calledOnce
-        .and.to.have.been.calledWith(match(Error))
-        .and.to.have.been.calledWith(match({ message: 'foobar' }))
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      expect(console.error.calls[0][0]).to.be.instanceOf(Error)
+        .and.to.have.property('message', 'foobar')
     })
   })
 })

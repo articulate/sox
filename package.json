@@ -45,8 +45,6 @@
     "eslint": "^4.11.0",
     "mocha": "^4.0.1",
     "nyc": "^11.3.0",
-    "prop-factory": "^1.0.0",
-    "sinon": "^4.1.4",
-    "sinon-chai": "^2.14.0"
+    "prop-factory": "^1.0.0"
   }
 }
