@@ -17,7 +17,9 @@ const logging = curry((next, data) =>
 const { handle } = require('..')({ middleware: [ logging ] })
 
 describe('handle', () => {
-  let db, restoreError
+  let db
+
+  const restoreError = console.error
 
   const get = data =>
     db[data.id]
@@ -48,7 +50,6 @@ describe('handle', () => {
   })
 
   beforeEach(() => {
-    restoreError = console.error
     console.error = spy()
     db = {
       a: { id: 'a', name: 'Johny', flag: true },
