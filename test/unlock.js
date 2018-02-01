@@ -22,7 +22,7 @@ describe('unlock', () => {
     next(new Error('broke'))
   }
 
-  const brokeThrown = (socket, next) => {
+  const brokeThrown = () => {
     throw new Error('broke')
   }
 
