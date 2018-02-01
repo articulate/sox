@@ -4,7 +4,7 @@ const {
 
 const { promisify, tapP } = require('@articulate/funky')
 
-// unlock : Socket -> [ Function ] -> a -> Promise a
+// unlock :: Socket -> [ Function ] -> a -> Promise a
 const unlock = (socket, middleware) => {
   const convert = compose(nAry(0), flip(partial)([ socket ]), promisify)
 

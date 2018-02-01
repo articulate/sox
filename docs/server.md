@@ -6,6 +6,7 @@
 | [`join`](#join) | `Socket -> (a -> String) -> a -> a` |
 | [`leave`](#leave) | `Socket -> (a -> String) -> a -> a` |
 | [`to`](#to) | `Socket -> (a -> String) -> String -> a -> a` |
+| [`unlock`](#unlock) | `Socket -> [ Function ] -> a -> Promise a` |
 
 ## Setup
 
@@ -64,7 +65,7 @@ See also [`join`](#join), [`leave`](#leave), [`to`](#to).
 
 ```js
 const courses         = require('../db/courses')
-const { handle, to }  = require('../lib/glue')
+const { handle, to }  = require('../lib/sox')
 
 const {
   DEL_COURSE,
@@ -98,7 +99,7 @@ const { pipeP } = require('ramda')
 
 const courses          = require('../db/courses')
 const { GET_COURSE }   = require('../actions/courses')
-const { handle, join } = require('../lib/glue')
+const { handle, join } = require('../lib/sox')
 
 const courseRoom = ({ id }) =>
   `courses/${id}`
@@ -132,7 +133,7 @@ const { pipeP } = require('ramda')
 
 const courses           = require('../db/courses')
 const { DEL_COURSE }    = require('../actions/courses')
-const { handle, leave } = require('../lib/glue')
+const { handle, leave } = require('../lib/sox')
 
 const courseRoom = ({ id }) =>
   `courses/${id}`
@@ -166,7 +167,7 @@ const { pipeP } = require('ramda')
 
 const { courses }    = require('../db/courses')
 const { PUT_COURSE } = require('../action/courses')
-const { handle, to } = require('../lib/glue')
+const { handle, to } = require('../lib/sox')
 
 const courseRoom = ({ id }) =>
   `courses/${id}`
@@ -179,6 +180,48 @@ module.exports = (socket, next) => {
 
   socket.on('action', handle({
     [ PUT_COURSE ]: putCourse
+  }))
+
+  next()
+}
+```
+
+### unlock
+
+```haskell
+unlock :: Socket -> [ Function ] -> a -> Promise a
+```
+
+Constructs a single-use function to unlock a list of secure [`socket.io` middleware](http://devdocs.io/socketio/server-api#namespace-use-fn-function-namespace) (not to be confused with [`@articulate/sox` middleware](#setup)).  Useful when you would like to expose some socket actions publicly, but only unlock others after the user has authenticated.
+
+Wrapped with [`R.once`](http://devdocs.io/ramda/index#once) to avoid executing the secure middleware repeatedly.
+
+```js
+const Joi          = require('joi')
+const { pipeP }    = require('ramda')
+const { validate } = require('@articulate/funky')
+
+const { AUTHENTICATE }   = require('../actions/auth')
+const { handle, unlock } = require('../lib/sox')
+
+const secureMiddleware = [
+  require('./courses'),
+  require('./lessons')
+]
+
+const authSchema = Joi.object({
+  token: Joi.string().required()
+}).required()
+
+module.exports = (socket, next) => {
+  const authenticate = pipeP(
+    validate(authSchema),
+    // check the user's token, and then...
+    unlock(socket, secureMiddleware)
+  )
+
+  socket.on('action', handle({
+    [ AUTHENTICATE ]: authenticate
   }))
 
   next()
