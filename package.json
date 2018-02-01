@@ -22,7 +22,6 @@
     "postversion": "git push --tags origin master",
     "prebuild": "yarn run clean",
     "pretest": "yarn run build",
-    "pretest:coverage": "yarn run build",
     "preversion": "git checkout master && yarn run build",
     "test": "mocha test --reporter=dot",
     "test:ci": "yarn run lint && yarn run test:coverage && yarn run coverage",
@@ -30,7 +29,7 @@
   },
   "dependencies": {
     "@articulate/ducks": "^0.1.0",
-    "@articulate/funky": "^0.1.0",
+    "@articulate/funky": "^0.3.0",
     "boom": "^5.2.0",
     "crocks": "^0.8.1",
     "cuid": "^1.3.8",
