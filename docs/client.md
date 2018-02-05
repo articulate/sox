@@ -8,7 +8,8 @@ Instantiates a [socket.io](https://socket.io/) client configured by the followin
 
 | Name | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `uri` | `String` | `''` | the socket.io service URI |
+| `query` | `Function` | `noop` | function to retrieve extra query params |
+| `uri` | `String` | `''` | the [socket.io](https://socket.io/) service URI |
 
 Returns a [socket.io](https://socket.io/) client instance with a few new helpful methods added.
 

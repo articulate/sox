@@ -4,6 +4,7 @@ const cuid   = require('cuid')
 const curry  = require('ramda/src/curry')
 const evolve = require('ramda/src/evolve')
 const io     = require('socket.io-client')
+const merge  = require('ramda/src/merge')
 const pick   = require('ramda/src/pick')
 const URL    = require('url')
 
@@ -15,15 +16,20 @@ const key = curry((type, payload) =>
   `${type}/${payload.id}`
 )
 
-const sox = ({ uri='' }={}) => {
-  const session = cuid()
+const sox = (args = {}) => {
+  const {
+    query = Function.prototype,
+    uri   = ''
+  } = args
+
+  const session = { session: cuid() }
   const url     = URL.parse(uri)
   const base    = URL.format(pick(['protocol', 'slashes', 'host'], url))
 
   const opts = {
     autoConnect: false,
     path: url.pathname,
-    query: { session }
+    query: merge(session, query())
   }
 
   const socket = io(base, opts)
@@ -40,6 +46,9 @@ const sox = ({ uri='' }={}) => {
     })
   )
 
+  const updateQuery = () =>
+    socket.io.opts.query = merge(session, query())
+
   // debounce : Number -> String -> a -> IO Async Action
   socket.debounce = curry((wait, type) =>
     debounce(wait, key(type), send(type))
@@ -54,6 +63,8 @@ const sox = ({ uri='' }={}) => {
   socket.throttle = curry((wait, type) =>
     throttle(wait, key(type), send(type))
   )
+
+  socket.on('reconnect_attempt', updateQuery)
 
   return socket
 }
