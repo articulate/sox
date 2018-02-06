@@ -1,12 +1,13 @@
-const action = require('@articulate/ducks/lib/action')
-const Async  = require('crocks/Async')
-const cuid   = require('cuid')
-const curry  = require('ramda/src/curry')
-const evolve = require('ramda/src/evolve')
-const io     = require('socket.io-client')
-const merge  = require('ramda/src/merge')
-const pick   = require('ramda/src/pick')
-const URL    = require('url')
+const action  = require('@articulate/ducks/lib/action')
+const Async   = require('crocks/Async')
+const compose = require('ramda/src/compose')
+const cuid    = require('cuid')
+const curry   = require('ramda/src/curry')
+const evolve  = require('ramda/src/evolve')
+const io      = require('socket.io-client')
+const merge   = require('ramda/src/merge')
+const pick    = require('ramda/src/pick')
+const URL     = require('url')
 
 const debounce = require('./debounce')
 const throttle = require('./throttle')
@@ -34,6 +35,8 @@ const sox = (args = {}) => {
 
   const socket = io(base, opts)
 
+  const connect = socket.connect.bind(socket)
+
   const emit = curry((type, payload, done) =>
     socket.emit('action', action(type, payload), done)
   )
@@ -49,6 +52,9 @@ const sox = (args = {}) => {
   const updateQuery = () =>
     socket.io.opts.query = merge(session, query())
 
+  // connect : () -> Socket
+  socket.connect = compose(connect, updateQuery)
+
   // debounce : Number -> String -> a -> IO Async Action
   socket.debounce = curry((wait, type) =>
     debounce(wait, key(type), send(type))
@@ -57,6 +63,7 @@ const sox = (args = {}) => {
   // send : String -> a -> Async Action
   socket.send = send
 
+  // session : String
   socket.session = session
 
   // debounce : Number -> String -> a -> IO Async Action
