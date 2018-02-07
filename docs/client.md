@@ -11,10 +11,17 @@ Instantiates a [socket.io](https://socket.io/) client configured by the followin
 | `query` | `Function` | `noop` | function to retrieve extra query params |
 | `uri` | `String` | `''` | the [socket.io](https://socket.io/) service URI |
 
+**Note:** The `query` function will be run before each socket connection, including reconnects, to update the handshake querystring.  It should return a plain object of query params.
+
 Returns a [socket.io](https://socket.io/) client instance with a few new helpful methods added.
 
 ```js
-const socket = require('@articulate/sox')({ uri: window.env.SERVICE_URI })
+const query = () =>
+  ({ token: getAuthToken() })
+
+const uri = window.env.SERVICE_URI
+
+const socket = require('@articulate/sox')({ query, uri })
 ```
 
 The instance will also have a `socket.session` property, a unique id that persists through socket reconnects.  Useful for managing resource locks between different browser sessions or tabs.
