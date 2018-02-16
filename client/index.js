@@ -65,7 +65,7 @@ const sox = (args = {}) => {
   socket.send = send
 
   // session : String
-  socket.session = session
+  Object.assign(socket, session)
 
   // debounce : Number -> String -> a -> IO Async Action
   socket.throttle = curry((wait, type) =>
