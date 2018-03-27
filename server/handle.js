@@ -1,7 +1,9 @@
-const { compose, curry, identity, map, pick, pipe, tap } = require('ramda')
+const {
+  compose, curry, identity, map, merge, pick, pipe, prop, reduceRight, tap
+} = require('ramda')
 
 const { action, error } = require('@articulate/ducks')
-const { reject }        = require('@articulate/funky')
+const { reject, resolve } = require('@articulate/funky')
 
 const fromError = require('./fromError')
 
@@ -15,18 +17,29 @@ const calm = curry((next, data) =>
     ))
 )
 
-const handle = ({ middleware=[] }) => {
-  const flow = compose(calm, ...middleware, send)
+const handle = ({ middleware=[], transformations=[] }) => {
+  const transform = reduceRight(
+    (fn, next) => axn => fn(axn, next),
+    identity,
+    transformations
+  )
+
+  console.log(transform({ type: 'foo' }))
+
+  const flow = compose(calm, ...middleware, send(transform))
 
   // handle : { k: (a -> Promise b) } -> (Action, Function) -> Promise Action
   return compose(handleWith, map(flow))
 }
 
-const handleWith = handlers => ({ type, payload }, respond=identity) =>
-  handlers[type] && handlers[type]({ type, payload, respond })
+const handleWith = handlers => (axn, respond=identity) =>
+  handlers[axn.type] && handlers[axn.type](merge(axn, { respond }))
 
-const send = curry((next, { type, payload, respond }) =>
-  Promise.resolve(payload)
+const send = curry((transform, next, axn) => {
+  const { type, respond } = axn
+  return Promise.resolve(axn)
+    .then(transform)
+    .then(prop('payload'))
     .then(next)
     .then(action(type))
     .then(tap(respond))
@@ -38,6 +51,6 @@ const send = curry((next, { type, payload, respond }) =>
       )),
       reject
     ))
-)
+})
 
 module.exports = handle

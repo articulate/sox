@@ -14,7 +14,16 @@ const logging = curry((next, data) =>
     .then(log)
 )
 
-const { handle } = require('..')({ middleware: [ logging ] })
+const tx = (axn, next) => {
+  axn.meta = 'foo'
+  console.log('YES', axn)
+  next(axn)
+}
+
+const { handle } = require('..')({
+  middleware: [ logging ],
+  transformations: [ tx ]
+})
 
 describe('handle', () => {
   let db
@@ -70,7 +79,7 @@ describe('handle', () => {
       handler(getUser, respond)
     )
 
-    it('responds with an action', () =>
+    it.only('responds with an action', () =>
       expect(respond.calls[0][0]).to.eql({
         type: 'GET_USER',
         payload: { id: 'a', name: 'Johny', flag: true }
