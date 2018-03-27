@@ -27,6 +27,7 @@ const sox = (args = {}) => {
   const session = { session: cuid() }
   const url     = URL.parse(uri)
   const base    = URL.format(pick(['protocol', 'slashes', 'host'], url))
+  const middleware = []
 
   const opts = {
     autoConnect: false,
@@ -38,9 +39,18 @@ const sox = (args = {}) => {
 
   const connect = bind(socket.connect, socket)
 
-  const emit = curry((type, payload, done) =>
-    socket.emit('action', action(type, payload), done)
-  )
+  const use = middle => {
+    middleware.unshift(middle)
+    return socket
+  }
+
+  const emit = curry((type, payload, done) => {
+    const doEmit = middleware.reduce(
+      (next, middle) => axn => middle(axn, next),
+      axn => socket.emit('action', axn, done)
+    )
+    doEmit(action(type, payload))
+  })
 
   const send = curry((type, payload) =>
     Async((reject, resolve) => {
@@ -63,6 +73,9 @@ const sox = (args = {}) => {
 
   // send : String -> a -> Async Action
   socket.send = send
+
+  // use : Function -> Socket
+  socket.use = use
 
   // session : String
   Object.assign(socket, session)
