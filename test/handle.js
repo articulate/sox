@@ -4,7 +4,7 @@ const { expect } = require('chai')
 const property   = require('prop-factory')
 const spy        = require('@articulate/spy')
 
-const { assoc, curry } = require('ramda')
+const { __, assoc, curry, evolve, identity, merge } = require('ramda')
 
 const log = property()
 
@@ -15,8 +15,9 @@ const logging = curry((next, data) =>
 )
 
 const tx = (axn, next) => {
-  axn.meta = 'foo'
-  console.log('YES', axn)
+  if (axn.type === 'TRANSFORM') {
+    axn = evolve({ payload: merge(__, { foo: 'bar' }) }, axn)
+  }
   next(axn)
 }
 
@@ -56,6 +57,7 @@ describe('handle', () => {
     HORRIBLE_ERROR: horribleError,
     NOT_FOUND: notFound,
     PUT_USER:  put,
+    TRANSFORM: identity,
   })
 
   beforeEach(() => {
@@ -79,7 +81,7 @@ describe('handle', () => {
       handler(getUser, respond)
     )
 
-    it.only('responds with an action', () =>
+    it('responds with an action', () =>
       expect(respond.calls[0][0]).to.eql({
         type: 'GET_USER',
         payload: { id: 'a', name: 'Johny', flag: true }
@@ -201,6 +203,22 @@ describe('handle', () => {
       expect(err).to.have.property('name', 'Error')
       expect(err).to.have.property('message', 'foobar')
       expect(err).to.have.property('stack').that.is.a('string')
+    })
+  })
+
+  describe('when transformation is applied', () => {
+    const transform = action('TRANSFORM', { baz: 'bip' })
+    const respond = spy()
+
+    beforeEach(() =>
+      handler(transform, respond)
+    )
+
+    it('has modified payload', () => {
+      expect(respond.calls[0][0]).to.eql({
+        type: 'TRANSFORM',
+        payload: { foo: 'bar', baz: 'bip' }
+      })
     })
   })
 })

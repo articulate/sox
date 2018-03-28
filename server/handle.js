@@ -3,7 +3,7 @@ const {
 } = require('ramda')
 
 const { action, error } = require('@articulate/ducks')
-const { reject, resolve } = require('@articulate/funky')
+const { reject } = require('@articulate/funky')
 
 const fromError = require('./fromError')
 
@@ -18,13 +18,14 @@ const calm = curry((next, data) =>
 )
 
 const handle = ({ middleware=[], transformations=[] }) => {
-  const transform = reduceRight(
-    (fn, next) => axn => fn(axn, next),
-    identity,
-    transformations
-  )
-
-  console.log(transform({ type: 'foo' }))
+  const transform = axn => new Promise(resolve => {
+    const doTransform = reduceRight(
+      (fn, next) => axn => fn(axn, next),
+      resolve,
+      transformations
+    )
+    return doTransform(axn)
+  })
 
   const flow = compose(calm, ...middleware, send(transform))
 
