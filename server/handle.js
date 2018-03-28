@@ -17,8 +17,8 @@ const calm = curry((next, data) =>
     ))
 )
 
-const handle = ({ middleware=[], transformations=[] }) => {
-  const transform = axn => new Promise(resolve => {
+const makeTransformFn = transformations => axn =>
+  new Promise(resolve => {
     const doTransform = reduceRight(
       (fn, next) => axn => fn(axn, next),
       resolve,
@@ -27,6 +27,8 @@ const handle = ({ middleware=[], transformations=[] }) => {
     return doTransform(axn)
   })
 
+const handle = ({ middleware=[], transformations=[] }) => {
+  const transform = makeTransformFn(transformations)
   const flow = compose(calm, ...middleware, send(transform))
 
   // handle : { k: (a -> Promise b) } -> (Action, Function) -> Promise Action
