@@ -3,6 +3,7 @@ const Boom       = require('boom')
 const { expect } = require('chai')
 const property   = require('prop-factory')
 const spy        = require('@articulate/spy')
+const Joi        = require('joi')
 
 const { assoc, curry } = require('ramda')
 
@@ -41,10 +42,15 @@ describe('handle', () => {
     throw new Error('foobar')
   }
 
+  const joiError = () => {
+    throw Joi.validate({}, Joi.object({ foo: Joi.string().required() })).error
+  }
+
   const handler = handle({
     BAD_REQUEST: badRequest,
     GET_USER:  get,
     HORRIBLE_ERROR: horribleError,
+    JOI_ERROR: joiError,
     NOT_FOUND: notFound,
     PUT_USER:  put,
   })
@@ -191,6 +197,37 @@ describe('handle', () => {
       const err = JSON.parse(console.error.calls[0][0])
       expect(err).to.have.property('name', 'Error')
       expect(err).to.have.property('message', 'foobar')
+      expect(err).to.have.property('stack').that.is.a('string')
+    })
+  })
+
+  describe('when it fails with a joi error', () => {
+    const joiError = action('JOI_ERROR', null)
+    const respond  = spy()
+
+    beforeEach(() =>
+      handler(joiError, respond)
+    )
+
+    it('responds with bad request error action', () => {
+      expect(respond.calls[0][0]).to.eql({
+        type: 'JOI_ERROR',
+        payload: {
+          data: undefined,
+          message: 'Bad Request',
+          name: 'Bad Request',
+          status: 400,
+        },
+        error: true,
+      })
+      expect(console.error.calls.length).to.equal(1)
+      expect(console.error.calls[0].length).to.equal(1)
+      const err = JSON.parse(console.error.calls[0][0])
+      expect(err).to.have.property('name', 'ValidationError')
+      expect(err).to.have.property(
+        'message',
+        'child "foo" fails because ["foo" is required]'
+      )
       expect(err).to.have.property('stack').that.is.a('string')
     })
   })
