@@ -1,9 +1,10 @@
-const { action } = require('@articulate/ducks')
-const Boom       = require('boom')
-const { expect } = require('chai')
-const property   = require('prop-factory')
-const spy        = require('@articulate/spy')
-const Joi        = require('joi')
+const { action }   = require('@articulate/ducks')
+const Boom         = require('boom')
+const { expect }   = require('chai')
+const property     = require('prop-factory')
+const spy          = require('@articulate/spy')
+const Joi          = require('joi')
+const { validate } = require('@articulate/funky')
 
 const { assoc, curry } = require('ramda')
 
@@ -42,9 +43,11 @@ describe('handle', () => {
     throw new Error('Some horrible error')
   }
 
-  const joiError = () => {
-    throw Joi.validate({}, Joi.object({ foo: Joi.string().required() })).error
-  }
+  const schema = Joi.object({
+    foo: Joi.string().required()
+  }).required()
+
+  const joiError = validate(schema)
 
   const handler = handle({
     BAD_REQUEST: badRequest,
@@ -202,7 +205,7 @@ describe('handle', () => {
   })
 
   describe('when it fails with a joi error', () => {
-    const joiError = action('JOI_ERROR', null)
+    const joiError = action('JOI_ERROR', {})
     const respond  = spy()
 
     beforeEach(() =>
