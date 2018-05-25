@@ -39,7 +39,7 @@ describe('handle', () => {
   }
 
   const horribleError = () => {
-    throw new Error('foobar')
+    throw new Error('Some horrible error')
   }
 
   const joiError = () => {
@@ -186,7 +186,7 @@ describe('handle', () => {
         type: 'HORRIBLE_ERROR',
         payload: {
           data: undefined,
-          message: 'An internal server error occurred',
+          message: 'Some horrible error',
           name: 'Internal Server Error',
           status: 500,
         },
@@ -196,7 +196,7 @@ describe('handle', () => {
       expect(console.error.calls[0].length).to.equal(1)
       const err = JSON.parse(console.error.calls[0][0])
       expect(err).to.have.property('name', 'Error')
-      expect(err).to.have.property('message', 'foobar')
+      expect(err).to.have.property('message', 'Some horrible error')
       expect(err).to.have.property('stack').that.is.a('string')
     })
   })

@@ -1,8 +1,20 @@
 const { boomify, badRequest } = require('boom')
-const { converge, identity, path, pipe, prop, unless, when } = require('ramda')
+const { converge, identity, pipe, prop, unless, when } = require('ramda')
 
-const formatError = ({ data, message, error: name, statusCode: status }) =>
-  ({ data, message, name, status })
+const formatError = err => {
+  const {
+    message,
+    output: {
+      payload: {
+        data,
+        error: name,
+        statusCode: status
+      }
+    }
+  } = err
+
+  return { data, message, name, status }
+}
 
 const joiError = pipe(
   prop('details'),
@@ -12,7 +24,6 @@ const joiError = pipe(
 const fromError = pipe(
   when(prop('isJoi'), joiError),
   unless(prop('isBoom'), boomify),
-  path(['output', 'payload']),
   formatError
 )
 
