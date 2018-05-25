@@ -21,6 +21,7 @@ const key = curry((type, payload) =>
 const sox = (args = {}) => {
   const {
     query = Function.prototype,
+    retry = true,
     uri   = ''
   } = args
 
@@ -72,6 +73,13 @@ const sox = (args = {}) => {
     throttle(wait, key(type), send(type))
   )
 
+  const reconnect = reason => {
+    if (retry && reason === 'io server disconnect') {
+      setTimeout(socket.connect, 2000)
+    }
+  }
+
+  socket.on('disconnect', reconnect)
   socket.on('reconnect_attempt', updateQuery)
 
   return socket

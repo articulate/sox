@@ -8,7 +8,8 @@ Instantiates a [socket.io](https://socket.io/) client configured by the followin
 
 | Name | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `query` | `Function` | `noop` | function to retrieve extra query params |
+| `query` | `Function` | `noop` | function to synchronously retrieve extra query params |
+| `retry` | `Boolean` | `true` | auto-reconnect when manually disconnected by the server |
 | `uri` | `String` | `''` | the [socket.io](https://socket.io/) service URI |
 
 **Note:** The `query` function will be run before each socket connection, including reconnects, to update the handshake querystring.  It should return a plain object of query params.
