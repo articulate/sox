@@ -1,9 +1,10 @@
-const { action } = require('@articulate/ducks')
-const Boom       = require('boom')
-const { expect } = require('chai')
-const property   = require('prop-factory')
-const spy        = require('@articulate/spy')
-const Joi        = require('joi')
+const { action }   = require('@articulate/ducks')
+const Boom         = require('boom')
+const { expect }   = require('chai')
+const property     = require('prop-factory')
+const spy          = require('@articulate/spy')
+const Joi          = require('joi')
+const { validate } = require('@articulate/funky')
 
 const { assoc, curry } = require('ramda')
 
@@ -39,12 +40,14 @@ describe('handle', () => {
   }
 
   const horribleError = () => {
-    throw new Error('foobar')
+    throw new Error('Some horrible error')
   }
 
-  const joiError = () => {
-    throw Joi.validate({}, Joi.object({ foo: Joi.string().required() })).error
-  }
+  const schema = Joi.object({
+    foo: Joi.string().required()
+  }).required()
+
+  const joiError = validate(schema)
 
   const handler = handle({
     BAD_REQUEST: badRequest,
@@ -186,7 +189,7 @@ describe('handle', () => {
         type: 'HORRIBLE_ERROR',
         payload: {
           data: undefined,
-          message: 'An internal server error occurred',
+          message: 'Some horrible error',
           name: 'Internal Server Error',
           status: 500,
         },
@@ -196,13 +199,13 @@ describe('handle', () => {
       expect(console.error.calls[0].length).to.equal(1)
       const err = JSON.parse(console.error.calls[0][0])
       expect(err).to.have.property('name', 'Error')
-      expect(err).to.have.property('message', 'foobar')
+      expect(err).to.have.property('message', 'Some horrible error')
       expect(err).to.have.property('stack').that.is.a('string')
     })
   })
 
   describe('when it fails with a joi error', () => {
-    const joiError = action('JOI_ERROR', null)
+    const joiError = action('JOI_ERROR', {})
     const respond  = spy()
 
     beforeEach(() =>

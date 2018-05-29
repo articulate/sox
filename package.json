@@ -29,12 +29,12 @@
   },
   "dependencies": {
     "@articulate/ducks": "^0.1.0",
-    "@articulate/funky": "^0.3.0",
-    "boom": "^5.2.0",
-    "crocks": "^0.8.1",
-    "cuid": "^1.3.8",
+    "@articulate/funky": "^1.0.1",
+    "boom": "^7.2.0",
+    "crocks": "^0.9.3",
+    "cuid": "^2.1.1",
     "ramda": "^0.25.0",
-    "socket.io-client": "^2.0.4"
+    "socket.io-client": "^2.1.1"
   },
   "devDependencies": {
     "@articulate/spy": "^0.0.1",
@@ -42,7 +42,7 @@
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
     "eslint": "^4.11.0",
-    "joi": "12",
+    "joi": "^13.3.0",
     "mocha": "^4.0.1",
     "nyc": "^11.3.0",
     "prop-factory": "^1.0.0"
