@@ -1,4 +1,5 @@
 const action  = require('@articulate/ducks/lib/action')
+const error   = require('@articulate/ducks/lib/error')
 const Async   = require('crocks/Async')
 const bind    = require('ramda/src/bind')
 const compose = require('ramda/src/compose')
@@ -8,6 +9,7 @@ const evolve  = require('ramda/src/evolve')
 const io      = require('socket.io-client')
 const merge   = require('ramda/src/merge')
 const pick    = require('ramda/src/pick')
+const tap     = require('ramda/src/tap')
 const URL     = require('url')
 
 const debounce = require('./debounce')
@@ -50,6 +52,22 @@ const sox = (args = {}) => {
     })
   )
 
+  const sendWithOptions = curry((options, type, payload) =>
+    Async((reject, resolve) => {
+      const { timeout } = options
+      let sent = send(type, payload)
+
+      if (timeout != null) {
+        const err = error(type, { message: `Timeout after ${timeout}ms` })
+        const timer = setTimeout(() => reject(err), timeout)
+        const cleanup = tap(() => clearTimeout(timer))
+        sent = sent.bimap(cleanup, cleanup)
+      }
+
+      sent.fork(reject, resolve)
+    })
+  )
+
   const updateQuery = () =>
     socket.io.opts.query = merge(session, query())
 
@@ -63,6 +81,9 @@ const sox = (args = {}) => {
 
   // send : String -> a -> Async Action
   socket.send = send
+
+  // send : Object -> String -> a -> Async Action
+  socket.sendWithOptions = sendWithOptions
 
   // session : String
   Object.assign(socket, session)
