@@ -1,10 +1,10 @@
 const action  = require('@articulate/ducks/lib/action')
-const error   = require('@articulate/ducks/lib/error')
 const Async   = require('crocks/Async')
 const bind    = require('ramda/src/bind')
 const compose = require('ramda/src/compose')
 const cuid    = require('cuid')
 const curry   = require('ramda/src/curry')
+const error   = require('@articulate/ducks/lib/error')
 const evolve  = require('ramda/src/evolve')
 const io      = require('socket.io-client')
 const merge   = require('ramda/src/merge')
@@ -77,7 +77,7 @@ const sox = (args = {}) => {
   // send : String -> a -> Async Action
   socket.send = send
 
-  // send : Object -> String -> a -> Async Action
+  // sendWithOptions : { k: v } -> String -> a -> Async Action
   socket.sendWithOptions = sendWithOptions
 
   // session : String
