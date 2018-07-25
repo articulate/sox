@@ -9,7 +9,6 @@ const evolve  = require('ramda/src/evolve')
 const io      = require('socket.io-client')
 const merge   = require('ramda/src/merge')
 const pick    = require('ramda/src/pick')
-const tap     = require('ramda/src/tap')
 const URL     = require('url')
 
 const debounce = require('./debounce')
@@ -52,21 +51,17 @@ const sox = (args = {}) => {
     })
   )
 
-  const sendWithOptions = curry((options, type, payload) =>
-    Async((reject, resolve) => {
-      const { timeout } = options
-      let sent = send(type, payload)
+  const sendWithOptions = curry((options, type, payload) => {
+    const { timeout } = options
+    let sent = send(type, payload)
 
-      if (timeout != null) {
-        const err = error(type, { message: `Timeout after ${timeout}ms` })
-        const timer = setTimeout(() => reject(err), timeout)
-        const cleanup = tap(() => clearTimeout(timer))
-        sent = sent.bimap(cleanup, cleanup)
-      }
+    if (timeout != null) {
+      const err = error(type, { message: `Timeout after ${timeout}ms` })
+      sent = sent.race(Async.rejectAfter(timeout, err))
+    }
 
-      sent.fork(reject, resolve)
-    })
-  )
+    return sent
+  })
 
   const updateQuery = () =>
     socket.io.opts.query = merge(session, query())

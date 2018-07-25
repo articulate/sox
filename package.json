@@ -31,7 +31,7 @@
     "@articulate/ducks": "^0.1.0",
     "@articulate/funky": "^1.0.1",
     "boom": "^7.2.0",
-    "crocks": "^0.9.3",
+    "crocks": "^0.10.1",
     "cuid": "^2.1.1",
     "ramda": "^0.25.0",
     "socket.io-client": "^2.1.1"
