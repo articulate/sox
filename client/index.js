@@ -4,6 +4,7 @@ const bind    = require('ramda/src/bind')
 const compose = require('ramda/src/compose')
 const cuid    = require('cuid')
 const curry   = require('ramda/src/curry')
+const error   = require('@articulate/ducks/lib/error')
 const evolve  = require('ramda/src/evolve')
 const io      = require('socket.io-client')
 const merge   = require('ramda/src/merge')
@@ -50,6 +51,18 @@ const sox = (args = {}) => {
     })
   )
 
+  const sendWithOptions = curry((options, type, payload) => {
+    const { timeout } = options
+    let sent = send(type, payload)
+
+    if (timeout != null) {
+      const err = error(type, { message: `Timeout after ${timeout}ms` })
+      sent = sent.race(Async.rejectAfter(timeout, err))
+    }
+
+    return sent
+  })
+
   const updateQuery = () =>
     socket.io.opts.query = merge(session, query())
 
@@ -63,6 +76,9 @@ const sox = (args = {}) => {
 
   // send : String -> a -> Async Action
   socket.send = send
+
+  // sendWithOptions : { k: v } -> String -> a -> Async Action
+  socket.sendWithOptions = sendWithOptions
 
   // session : String
   Object.assign(socket, session)
