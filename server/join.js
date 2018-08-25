@@ -1,8 +1,9 @@
-const { curryN, tap } = require('ramda')
+const { curry } = require('ramda')
 
-// join : Socket -> (a -> String) -> a -> a
-const join = curryN(2, (socket, room) => tap(data =>
-  socket.join(room(data))
-))
+// join :: (Action -> String) -> Action -> Action
+const join = (room, axn) => {
+  axn.meta.socket.join(room(axn))
+  return axn
+}
 
-module.exports = join
+module.exports = curry(join)

@@ -1,7 +1,8 @@
-module.exports = (opts={}) => ({
-  handle: require('./handle')(opts),
-  join:   require('./join'),
-  leave:  require('./leave'),
-  to:     require('./to'),
-  unlock: require('./unlock')
-})
+exports.action = require('./action')
+exports.error  = require('./error')
+exports.handle = require('./handle')
+exports.join   = require('./join')
+exports.leave  = require('./leave')
+exports.logger = require('./logger')
+exports.mount  = require('./mount')
+exports.to     = require('./to')

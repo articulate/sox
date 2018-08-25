@@ -1,8 +1,9 @@
-const { curryN, tap } = require('ramda')
+const { curry } = require('ramda')
 
-// leave : Socket -> (a -> String) -> a -> a
-const leave = curryN(2, (socket, room) => tap(data =>
-  socket.leave(room(data))
-))
+// leave :: (Action -> String) -> Action -> Action
+const leave = (room, axn) => {
+  axn.meta.socket.leave(room(axn))
+  return axn
+}
 
-module.exports = leave
+module.exports = curry(leave)
