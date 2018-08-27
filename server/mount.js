@@ -16,8 +16,8 @@ const mount = (opts={}) => {
 
   const connected = socket => {
     const addMeta = pipe(
-      assocPath(['meta', 'socket'], socket),
-      assocPath(['meta', 'session'], socket.handshake.query.session)
+      assocPath(['meta', 'session'], socket.handshake.query.session),
+      assocPath(['meta', 'socket'], socket)
     )
 
     const handleAction = (axn, send=identity) =>
