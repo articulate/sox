@@ -1,5 +1,5 @@
 const {
-  assocPath, compose, curry, identity, is, tap, when
+  assocPath, compose, curry, identity, is, pipe, tap, when
 } = require('ramda')
 
 const cleanMeta    = require('./cleanMeta')
@@ -15,8 +15,10 @@ const mount = (opts={}) => {
   } = opts
 
   const connected = socket => {
-    const addMeta =
-      assocPath(['meta', 'socket'], socket)
+    const addMeta = pipe(
+      assocPath(['meta', 'socket'], socket),
+      assocPath(['meta', 'session'], socket.handshake.query.session)
+    )
 
     const handleAction = (axn, send=identity) =>
       Promise.resolve(axn)
