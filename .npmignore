@@ -6,6 +6,7 @@
 .yarn*
 /.nyc_output
 /client
+/demo
 /docs
 /node_modules
 /test

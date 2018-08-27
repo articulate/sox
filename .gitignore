@@ -1,6 +1,6 @@
 *.log
 .DS_Store
+.nyc_output
 .yarn*
-/.nyc_output
-/dist
-/node_modules
+dist
+node_modules

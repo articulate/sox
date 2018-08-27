@@ -7,14 +7,14 @@ const error        = require('./error')
 const formatErrors = require('./formatErrors')
 const logger       = require('./logger')
 
-// mount :: { k: v } -> Socket -> Socket
+// mount :: { k: v } -> (Socket, Function) -> ()
 const mount = (opts={}) => {
   const {
     app = identity,
     cry = logger
   } = opts
 
-  const connected = socket => {
+  const connected = (socket, done) => {
     const addMeta = pipe(
       assocPath(['meta', 'session'], socket.handshake.query.session),
       assocPath(['meta', 'socket'], socket)
@@ -29,7 +29,8 @@ const mount = (opts={}) => {
         .then(cleanMeta)
         .then(send)
 
-    return socket.on('action', handleAction)
+    socket.on('action', handleAction)
+    done()
   }
 
   const wrapError = axn =>

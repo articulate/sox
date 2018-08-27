@@ -1,0 +1,39 @@
+{
+  "name": "@articulate/sox-demo",
+  "version": "0.0.0",
+  "description": "Demo app for articulate/sox",
+  "main": "server/index.js",
+  "repository": "git@github.com:articulate/sox.git",
+  "author": "articulate",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint server",
+    "start": "run-p start:*",
+    "start:serve": "nodemon -w server ."
+  },
+  "dependencies": {
+    "@articulate/funky": "^1.3.0",
+    "crocks": "^0.10.1",
+    "ioredis": "^4.0.0",
+    "paperplane": "^2.0.0",
+    "puddles": "^2.1.6",
+    "pug": "^2.0.3",
+    "ramda": "^0.25.0",
+    "redux-functor": "^1.0.0",
+    "redux-future2": "^1.0.0",
+    "socket.io": "^2.1.1",
+    "socket.io-redis": "^5.2.0",
+    "tinyfunk": "^1.2.1"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "clean-css-cli": "^4.2.1",
+    "eslint": "^5.4.0",
+    "exorcist": "^1.0.1",
+    "less": "^3.8.1",
+    "nodemon": "^1.18.3",
+    "normalize.css": "^8.0.0",
+    "npm-run-all": "^4.1.3",
+    "watchify": "^3.11.0"
+  }
+}

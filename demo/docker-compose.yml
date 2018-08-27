@@ -1,0 +1,25 @@
+version: '2'
+services:
+  app:
+    build: .
+    depends_on:
+      - redis
+    environment:
+      REDIS_URI: redis://redis:6379
+    labels:
+      SERVICE_3000_NAME: sox-demo
+      SERVICE_3000_TAGS: urlprefix-sox-demo.*/
+      SERVICE_3000_CHECK_TCP: 'true'
+      SERVICE_3000_CHECK_INTERVAL: 15s
+    mem_reservation: "256m"
+    ports:
+      - 3000
+    volumes:
+      - '..:/service/node_modules/@articulate/sox'
+      - './package.json:/service/package.json'
+      - './server:/service/server'
+
+  redis:
+    image: redis
+    expose:
+      - '6379'
