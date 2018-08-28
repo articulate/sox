@@ -1,0 +1,20 @@
+.hover(@rules) {
+  &:active { @rules(); }
+  @media (hover: hover) {
+    &:hover { @rules(); }
+  }
+}
+
+.position(@position: absolute; @top: auto; @right: auto; @bottom: auto; @left: auto) {
+  bottom: @bottom;
+  left: @left;
+  position: @position;
+  right: @right;
+  top: @top;
+}
+
+.transition(@property: all; @duration: 0.2s; @easing: ease-in-out) {
+  transition-property: @property;
+  transition-duration: @duration;
+  transition-timing-function: @easing;
+}

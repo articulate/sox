@@ -1,0 +1,28 @@
+.button {
+  align-items: center;
+  border: .1rem solid @gray-30;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  outline: none;
+  text-transform: uppercase;
+
+  .hover({
+    border: .2rem solid @gray-10;
+  })
+}
+
+.fieldset {
+  align-items: center;
+  display: flex;
+}
+
+.input {
+  border: .1rem solid @gray-30;
+  padding: 1rem 1.4rem;
+
+  &:focus {
+    border: .2rem solid @gray-10;
+    padding: 1rem 1.3rem;
+  }
+}

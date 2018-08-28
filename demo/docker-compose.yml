@@ -6,6 +6,7 @@ services:
       - redis
     environment:
       REDIS_URI: redis://redis:6379
+      SHELL: '/bin/sh'
     labels:
       SERVICE_3000_NAME: sox-demo
       SERVICE_3000_TAGS: urlprefix-sox-demo.*/
@@ -16,6 +17,7 @@ services:
       - 3000
     volumes:
       - '..:/service/node_modules/@articulate/sox'
+      - './client:/service/client'
       - './package.json:/service/package.json'
       - './server:/service/server'
 
