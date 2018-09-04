@@ -1,4 +1,4 @@
-const { compose, propEq, when } = require('tinyfunk')
+const { compose, partial, propEq, when } = require('tinyfunk')
 const p = require('puddles')
 
 const { prevent, targetVal } = require('../lib/events')
@@ -7,13 +7,17 @@ const noSpaces =
   when(propEq('keyCode', 32), prevent)
 
 const Home = (actions, state) => {
-  const { home: { setRoom } } = actions
+  const { home: { setRoom }, route: { go } } = actions
   const { home: { room } } = state
+
+  const href = `/${room}`
 
   return p('div.home', [
     p('h1.title', 'Welcome, friend!'),
     p('div.instructions', 'Please enter the name of your chat room.'),
-    p('div.fieldset', [
+    p('form.fieldset', {
+      on: { submit: compose(partial(go, [ href ]), prevent) }
+    }, [
       p('input.input.roomname', {
         attrs: {
           autofocus: true,
@@ -26,9 +30,7 @@ const Home = (actions, state) => {
         },
         props: { value: room }
       }),
-      p('a.button.join', {
-        attrs: { href: `/${room}` }
-      }, 'Join room')
+      p('a.button.join', { attrs: { href } }, 'Join room')
     ])
   ])
 }

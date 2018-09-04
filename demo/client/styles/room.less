@@ -1,0 +1,41 @@
+.room {
+  .position(fixed; 0; 0; 0; 0);
+  display: flex;
+  flex-direction: column;
+
+  .content {
+    flex-grow: 2;
+    padding-left: 1rem;
+  }
+
+  .gravity {
+    flex-grow: 2;
+    flex-shrink: 2;
+  }
+
+  .handle {
+    flex-shrink: 0;
+    font-weight: 700;
+    width: 10rem;
+  }
+
+  .message {
+    display: flex;
+    flex-shrink: 0;
+    padding: .5rem 2.5rem;
+  }
+
+  .messages {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    overflow-y: auto;
+    padding: 1rem 0;
+  }
+
+  .talkbox {
+    flex-shrink: 0;
+    height: 4rem;
+    margin: 1rem;
+  }
+}

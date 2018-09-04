@@ -22,6 +22,6 @@ services:
       - './server:/service/server'
 
   redis:
-    image: redis
+    image: redis:5.0-rc-alpine
     expose:
       - '6379'
