@@ -1,11 +1,14 @@
+const { compose, mergeAll, tap, values } = require('ramda')
 const io = require('socket.io')
-const { mount } = require('@articulate/sox')
-const redis = require('socket.io-redis')
-const { tap } = require('ramda')
+const { handle, logger, mount } = require('@articulate/sox')
+
+const actions = require('require-dir')()
+
+const handler = compose(handle, mergeAll, values)(actions)
+
+const app = compose(handler, logger)
 
 const sockets = server =>
-  io(server)
-    .adapter(redis(process.env.REDIS_URI))
-    .use(mount())
+  io(server).use(mount({ app }))
 
 module.exports = tap(sockets)

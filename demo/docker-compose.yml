@@ -2,10 +2,7 @@ version: '2'
 services:
   app:
     build: .
-    depends_on:
-      - redis
     environment:
-      REDIS_URI: redis://redis:6379
       SHELL: '/bin/sh'
     labels:
       SERVICE_3000_NAME: sox-demo
@@ -16,12 +13,10 @@ services:
     ports:
       - 3000
     volumes:
+      - 'db:/service/db'
       - '..:/service/node_modules/@articulate/sox'
       - './client:/service/client'
       - './package.json:/service/package.json'
       - './server:/service/server'
-
-  redis:
-    image: redis:5.0-rc-alpine
-    expose:
-      - '6379'
+volumes:
+  db:

@@ -1,4 +1,13 @@
-const { path, tap } = require('tinyfunk')
+const { path, propEq, tap, when } = require('tinyfunk')
+
+// clearTarget :: Event -> Event
+exports.clearTarget = tap(e =>
+  e.target.value = ''
+)
+
+// onEnter :: (Event -> a) -> Event -> a
+exports.onEnter =
+  when(propEq('keyCode', 13))
 
 // prevent :: Event -> Event
 exports.prevent = tap(e =>
