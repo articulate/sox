@@ -6,7 +6,7 @@ const actions = require('require-dir')()
 
 const handler = compose(handle, mergeAll, values)(actions)
 
-const app = compose(handler, logger)
+const app = compose(handler, logger)  // NEXT UP: obviate this
 
 const sockets = server =>
   io(server).use(mount({ app }))

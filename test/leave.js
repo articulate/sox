@@ -3,18 +3,20 @@ const { prop }   = require('ramda')
 const property   = require('prop-factory')
 const spy        = require('@articulate/spy')
 
-const { leave } = require('..')()
+const { action, leave } = require('..')
 
-const room = prop('foo')
+const room = prop('payload')
 
 describe('leave', () => {
-  const data   = { foo: 'bar' }
+  const axn    = action('TEST', 'foo')
   const res    = property()
   const socket = { leave: spy() }
 
+  axn.meta = { socket }
+
   beforeEach(() =>
-    Promise.resolve(data)
-      .then(leave(socket, room))
+    Promise.resolve(axn)
+      .then(leave(room))
       .then(res)
   )
 
@@ -22,11 +24,11 @@ describe('leave', () => {
     socket.leave.reset()
   )
 
-  it('joins the room', () =>
-    expect(socket.leave.calls[0][0]).to.equal('bar')
+  it('leaves the room', () =>
+    expect(socket.leave.calls[0][0]).to.equal('foo')
   )
 
-  it('taps to pass through the data', () =>
-    expect(res()).to.equal(data)
+  it('taps to pass through the action', () =>
+    expect(res()).to.equal(axn)
   )
 })

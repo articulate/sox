@@ -1,16 +1,15 @@
+const { dissocPath, prop } = require('ramda')
 const { expect } = require('chai')
-const { prop }   = require('ramda')
 const property   = require('prop-factory')
 const spy        = require('@articulate/spy')
 
-const { to } = require('..')()
+const { action, to } = require('..')
 
-const room = prop('foo')
+const room = prop('payload')
 
 describe('to', () => {
-  const payload = { foo: 'bar' }
-  const res     = property()
-  const type    = 'TYPE'
+  const axn  = action('TEST', 'foo')
+  const res  = property()
 
   const socket = {
     emit: spy(),
@@ -19,9 +18,11 @@ describe('to', () => {
 
   socket.broadcast = socket
 
+  axn.meta = { socket }
+
   beforeEach(() =>
-    Promise.resolve(payload)
-      .then(to(socket, room, type))
+    Promise.resolve(axn)
+      .then(to(room))
       .then(res)
   )
 
@@ -31,14 +32,15 @@ describe('to', () => {
   })
 
   it('broadcasts to the room', () =>
-    expect(socket.to.calls[0][0]).to.equal('bar')
+    expect(socket.to.calls[0][0]).to.equal('foo')
   )
 
   it('emits an action', () =>
-    expect(socket.emit.calls[0]).to.eql(['action', { type, payload }])
+    expect(socket.emit.calls[0])
+      .to.eql(['action', dissocPath(['meta', 'socket'], axn)])
   )
 
-  it('taps to pass through the payload', () =>
-    expect(res()).to.equal(payload)
+  it('taps to pass through the action', () =>
+    expect(res()).to.equal(axn)
   )
 })
