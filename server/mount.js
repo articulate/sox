@@ -2,16 +2,17 @@ const {
   assocPath, compose, curry, identity, is, pipe, tap, when
 } = require('ramda')
 
-const cleanMeta    = require('./cleanMeta')
-const error        = require('./error')
-const formatErrors = require('./formatErrors')
-const logger       = require('./logger')
+const cleanMeta     = require('./cleanMeta')
+const defaultLogger = require('./logger')
+const error         = require('./error')
+const formatErrors  = require('./formatErrors')
 
 // mount :: { k: v } -> (Socket, Function) -> ()
 const mount = (opts={}) => {
   const {
-    app = identity,
-    cry = logger
+    app    = identity,
+    cry    = defaultLogger,
+    logger = defaultLogger
   } = opts
 
   const connected = (socket, done) => {
@@ -22,6 +23,7 @@ const mount = (opts={}) => {
 
     const handleAction = (axn, send=identity) =>
       Promise.resolve(axn)
+        .then(logger)
         .then(addMeta)
         .then(app)
         .catch(wrapError(axn))
