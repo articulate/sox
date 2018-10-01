@@ -1,8 +1,12 @@
 const { boomify, badRequest } = require('boom')
 
 const {
-  converge, evolve, identity, is, pipe, prop, unless, when
+  compose, converge, evolve, identity, is, join,
+  pipe, pluck, prop, unless, when
 } = require('ramda')
+
+const combinedMessage =
+  compose(join(', '), pluck('message'))
 
 const fromError = err => {
   const {
@@ -22,7 +26,7 @@ const fromError = err => {
 const joiError =
   pipe(
     prop('details'),
-    converge(badRequest, [ prop('message'), identity ])
+    converge(badRequest, [ combinedMessage, identity ])
   )
 
 const formatError =
