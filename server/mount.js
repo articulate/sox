@@ -37,6 +37,7 @@ const mount = (opts={}) => {
         .then(send)
 
     socket.on('action', handleAction)
+    socket.on('error', cry)
     done()
   }
 

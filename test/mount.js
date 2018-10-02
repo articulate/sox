@@ -200,6 +200,28 @@ describe('mount', () => {
     })
   })
 
+  describe('when a socket.io error occurs', () => {
+    const cry = spy()
+    const socket = Socket()
+
+    before(done =>
+      mount({ cry })(socket, done)
+    )
+
+    beforeEach(() =>
+      socket.emitSync('error', new Error('socket.io broke'))
+    )
+
+    afterEach(() =>
+      cry.reset()
+    )
+
+    it('cries', () => {
+      expect(cry.calls.length).to.equal(1)
+      expect(cry.calls[0][0]).to.be.an('Error')
+    })
+  })
+
   describe('when action sent not as request/response', () => {
     const app = spy()
     const socket = Socket()
