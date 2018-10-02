@@ -6,4 +6,8 @@
 
 Our super-special sockets stuff.
 
-See the [client](https://github.com/articulate/sox/blob/master/docs/client.md) and [server](https://github.com/articulate/sox/blob/master/docs/server.md) documentation for details and examples.
+## Documentation
+
+- [Client docs](https://github.com/articulate/sox/blob/master/docs/client.md)
+- [Server docs](https://github.com/articulate/sox/blob/master/docs/server.md)
+- [Migration guide](https://github.com/articulate/sox/blob/master/docs/migration-guide.md)
