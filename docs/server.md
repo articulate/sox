@@ -182,6 +182,41 @@ const sockets = server =>
 module.exports = tap(sockets)
 ```
 
+### mount
+
+```haskell
+mount :: { k: v } -> (Socket, Function) -> ()
+```
+
+Wraps a top-level handler to prepare for use as a [`socket.io` middleware](https://devdocs.io/socketio/server-api#namespace-use-fn-function-namespace).  Lifts the handler into a `Promise` chain.  Accepts the following options:
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `app` | `Action -> Promise Action` | [`R.identity`](http://devdocs.io/ramda/index#identity) | top-level action handler function |
+| `cry` | `Error -> a` | [`sox.logger`](#logger) | error logger |
+| `logger` | `a -> a` | [`sox.logger`](#logger) | request action logger |
+
+The `cry` option is primarily intended for logging, but is also the correct way to notify your error aggregation service.  All errors passed to the `cry` function will have an `axn` property that can be used to include request action information in your notification.
+
+Injects the current [`session`](https://github.com/articulate/sox/blob/master/docs/client.md#client-api) and `socket` into the `action.meta`.  The `action.meta.session` can be useful for managing resource locks between different browser sessions or tabs.  You'll need to hang onto the `action.meta.socket` for [joining](#join), [leaving](#leave), and [broadcasting to](#to) rooms.  Cleans out the `action.meta.socket` before sending the response action to the client.
+
+See also [`handle`](#handle), [`join`](#join), [`mount`](#mount), [`to`](#to).
+
+```js
+const { tap } = require('ramda')
+const io = require('socket.io')
+const { mount } = require('@articulate/sox')
+
+const app = require('./app')
+
+const sockets = server =>
+  io(server).use(mount({ app }))
+
+module.exports = tap(sockets)
+```
+
+You can also find a more complex example of how to architect your `sox` application in the [demo](https://github.com/articulate/sox/tree/master/demo).
+
 ### overPayload
 
 ```haskell

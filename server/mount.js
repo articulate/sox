@@ -38,8 +38,11 @@ const mount = (opts={}) => {
     done()
   }
 
+  const sob = axn => err =>
+    cry(Object.assign(err, { axn }))
+
   const wrapError = axn =>
-    when(is(Error), compose(error(axn.type), tap(cry)))
+    when(is(Error), compose(error(axn.type), tap(sob(axn))))
 
   return connected
 }
