@@ -1,7 +1,7 @@
 const { concat, path, pipeP } = require('ramda')
-const { assocWithP, evolveP, validate } = require('@articulate/funky')
+const { assocWithP, validate } = require('@articulate/funky')
 const Joi = require('joi')
-const { join, to } = require('@articulate/sox')
+const { join, overPayload, to } = require('@articulate/sox')
 
 const messages = require('../db/messages')
 
@@ -21,23 +21,23 @@ const putSchema = Joi.object({
 
 const loadMessages =
   pipeP(
-    evolveP({
-      payload: pipeP(
+    overPayload(
+      pipeP(
         validate(loadSchema),
         assocWithP('messages', messages.load)
       )
-    }),
+    ),
     join(path(['payload', 'room']))
   )
 
 const putMessage =
   pipeP(
-    evolveP({
-      payload: pipeP(
+    overPayload(
+      pipeP(
         validate(putSchema),
         messages.put
       )
-    }),
+    ),
     to(path(['payload', 'room']))
   )
 

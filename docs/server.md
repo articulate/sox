@@ -9,9 +9,10 @@
 | [`leave`](#leave) | `(Action -> String) -> Action -> Action` |
 | [`logger`](#logger) | `a -> a` |
 | [`mount`](#mount) | `{ k: v } -> (Socket, Function) -> ()` |
+| [`overPayload`](#overpayload) | `(a -> Promise b) -> Action -> Promise Action` |
 | [`to`](#to) | `(Action -> String) -> Action -> Action` |
 
-**Note:** The type `Action` above refers to an [FSA-compliant](https://github.com/redux-utilities/flux-standard-action) action of the shape `{ type, payload, meta }`.
+The type `Action` above refers to an [FSA-compliant](https://github.com/redux-utilities/flux-standard-action) action of the shape `{ type, payload, meta }`.
 
 ### action
 
@@ -61,7 +62,7 @@ Accepts a map of action types to unary handler functions.  Returns an `app` hand
 
 The correct handler function will be chosen based on the `type` of an incoming action, and will then be called with that action.  Lifts each handler into a `Promise` chain, and rejects with a [`Boom.notFound`](https://github.com/hapijs/boom/#boomnotfoundmessage-data) error if no handler is found for the given action `type`.
 
-See also [`mount`](#mount).
+See also [`mount`](#mount), [`overPayload`](#overpayload).
 
 ```js
 const { handle, mount } = require('@articulate/sox')
@@ -92,8 +93,7 @@ Accepts a room function and an action.  The room function is used to translate t
 See also [`leave`](#leave), [`mount`](#mount), [`to`](#to).
 
 ```js
-const { evolveP } = require('@articulate/funky')
-const { handle, join } = require('@articulate/sox')
+const { handle, join, overPayload } = require('@articulate/sox')
 const { pipeP } = require('ramda')
 
 const courses = require('../db/courses')
@@ -102,10 +102,11 @@ const { GET_COURSE } = require('../actions/courses')
 const courseRoom = axn =>
   `courses/${axn.payload.id}`
 
-const getCourse = pipeP(
-  evolveP({ payload: courses.getCourse }),
-  join(courseRoom)
-)
+const getCourse =
+  pipeP(
+    overPayload(courses.getCourse),
+    join(courseRoom)
+  )
 
 const app = handle({
   [ GET_COURSE ]: getCourse
@@ -123,8 +124,7 @@ Accepts a room function and an action.  The room function is used to translate t
 See also [`join`](#join), [`mount`](#mount), [`to`](#to).
 
 ```js
-const { evolveP } = require('@articulate/funky')
-const { handle, leave } = require('@articulate/sox')
+const { handle, leave, overPayload } = require('@articulate/sox')
 const { pipeP } = require('ramda')
 
 const courses = require('../db/courses')
@@ -133,13 +133,49 @@ const { DEL_COURSE } = require('../actions/courses')
 const courseRoom = axn =>
   `courses/${axn.payload.id}`
 
-const delCourse = pipeP(
-  evolveP({ payload: courses.delCourse }),
-  leave(courseRoom)
-)
+const delCourse =
+  pipeP(
+    overPayload(courses.delCourse),
+    leave(courseRoom)
+  )
 
 const app = handle({
   [ DEL_COURSE ]: delCourse
+})
+```
+
+### overPayload
+
+```haskell
+overPayload :: (a -> Promise b) -> Action -> Promise Action
+```
+
+Accepts an async function, and returns a handler function.  Intended to help simplify doing work just over the action payload, such that important bits kept in the `meta` (like `session` and `socket`) aren't lost in transit.
+
+Usage is equivalent to both of the following:
+
+```js
+const handler =
+  evolveP({ payload: theActualHandler })
+
+const handler =
+  overP(lensProp('payload'), theActualHandler)
+```
+
+See also [`handle`](#handle).
+
+```js
+const { handle, overPayload } = require('@articulate/sox')
+const { pipeP } = require('ramda')
+
+const { GET_PROFILE } = require('../actions/profiles')
+const profiles = require('../services/profiles')
+
+const getProfile =
+  overPayload(profiles.getProfile)
+
+const app = handle({
+  [ GET_PROFILE ]: getProfile
 })
 ```
 
@@ -151,13 +187,12 @@ to :: (Action -> String) -> Action -> Action
 
 Accepts a room function and an action.  The room function is used to translate the action into a room identifier.  An `'action'` event with the action is then [broadcast to all sockets in that room](http://devdocs.io/socketio/rooms-and-namespaces#rooms) (with the exception of the [`action.meta.socket`](#mount)).  Finally, the action is passed through.
 
-**Note:** To broadcast to all sockets in a room from code outside the `sox` request/reponse cycle, set the `action.meta.socket` to a [`socket.io-emitter`](https://yarnpkg.com/en/package/socket.io-emitter).
+To broadcast to all sockets in a room from code outside the `sox` request/reponse cycle, set the `action.meta.socket` to a [`socket.io-emitter`](https://yarnpkg.com/en/package/socket.io-emitter).
 
 See also [`join`](#join), [`leave`](#leave), [`mount`](#mount).
 
 ```js
-const { evolveP } = require('@articulate/funky')
-const { handle, to } = require('@articulate/sox')
+const { handle, overPayload, to } = require('@articulate/sox')
 const { pipeP } = require('ramda')
 
 const { courses } = require('../db/courses')
@@ -166,10 +201,11 @@ const { PUT_COURSE } = require('../action/courses')
 const courseRoom = axn =>
   `courses/${axn.payload.id}`
 
-const putCourse = pipeP(
-  evolveP({ payload: courses.putCourse }),
-  to(courseRoom)
-)
+const putCourse =
+  pipeP(
+    overPayload(courses.putCourse),
+    to(courseRoom)
+  )
 
 const app = handle({
   [ PUT_COURSE ]: putCourse
