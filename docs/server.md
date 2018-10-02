@@ -144,6 +144,44 @@ const app = handle({
 })
 ```
 
+### logger
+
+```haskell
+logger :: a -> a
+```
+
+General purpose `JSON` logger for use with `sox`.  Used as the default `cry` and `logger` options in [`mount`](#mount).
+
+Cleans errors to just `{ message, name, stack }`, and cleans the injected [`action.meta.socket`](#mount) (because that would be silly to log).
+
+See also [`mount`](#mount).
+
+```js
+// server/lib/logger.js (example custom logger)
+
+const { compose, dissocPath } = require('ramda')
+const { logger } = require('@articulate/sox')
+
+module.exports =
+  compose(logger, dissocPath(['meta', 'token']))
+```
+
+```js
+// server/sockets/index.js
+
+const io = require('socket.io')
+const { mount } = require('@articulate/sox')
+const { tap } = require('ramda')
+
+const app = require('./app')
+const logger = require('../lib/logger')
+
+const sockets = server =>
+  io(server).use(mount({ app, logger }))
+
+module.exports = tap(sockets)
+```
+
 ### overPayload
 
 ```haskell

@@ -10,7 +10,7 @@ const { handle, mount } = require('..')
 
 const Socket = () => {
   const handlers = {}
-  const handshake = { query: { session: 'session' } }
+  const handshake = { query: { session: '123' } }
 
   const emit = (type, data) =>
     new Promise(res =>
@@ -31,7 +31,7 @@ const wait = delay =>
   new Promise(res => setTimeout(res, delay))
 
 describe('mount', () => {
-  const axn = { type: 'TYPE', payload: 'PAYLOAD', meta: {} }
+  const axn = { type: 'TYPE', payload: 'PAYLOAD', meta: { session: '456' } }
   const res = property()
 
   describe('with no options', () => {
@@ -226,6 +226,7 @@ describe('mount', () => {
 
   describe('supplemental meta', () => {
     const app = property()
+    const axn = { type: 'TYPE', payload: 'PAYLOAD' }
     const socket = Socket()
 
     before(done =>
@@ -237,7 +238,7 @@ describe('mount', () => {
     )
 
     it('includes the session', () =>
-      expect(app().meta).to.include({ session: 'session' })
+      expect(app().meta).to.include({ session: '123' })
     )
 
     it('includes the socket', () =>

@@ -1,4 +1,3 @@
-const action  = require('@articulate/ducks/lib/action')
 const Async   = require('crocks/Async')
 const bind    = require('ramda/src/bind')
 const compose = require('ramda/src/compose')
@@ -40,7 +39,7 @@ const sox = (args = {}) => {
   const connect = bind(socket.connect, socket)
 
   const emit = curry((type, payload, done) =>
-    socket.emit('action', action(type, payload), done)
+    socket.emit('action', { type, payload, meta: session }, done)
   )
 
   const send = curry((type, payload) =>

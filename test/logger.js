@@ -19,7 +19,7 @@ describe('logger', () => {
 
     it('cleans out the meta before stringifying and logging', () =>
       expect(console.info.calls[0])
-        .to.eql(['{"type":"FOO","payload":"bar","meta":{}}'])
+        .to.eql(['{"type":"FOO","payload":"bar","meta":{"session":"123"}}'])
     )
 
     it('taps to pass thru the action', () =>

@@ -1,9 +1,7 @@
-const { dissocPath, pipe } = require('ramda')
+const { dissocPath } = require('ramda')
 
 // cleanMeta :: Action -> Action
-const cleanMeta = pipe(
-  dissocPath(['meta', 'session']),
+const cleanMeta =
   dissocPath(['meta', 'socket'])
-)
 
 module.exports = cleanMeta
