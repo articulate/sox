@@ -16,10 +16,12 @@ const mount = (opts={}) => {
   } = opts
 
   const connected = (socket, done) => {
+    const { session } = socket.handshake.query
+
     const addMeta = pipe(
       unless(
         path(['meta', 'session']),
-        assocPath(['meta', 'session'], socket.handshake.query.session)
+        assocPath(['meta', 'session'], session)
       ),
       assocPath(['meta', 'socket'], socket)
     )
