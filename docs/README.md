@@ -1,3 +1,3 @@
 - [Client docs](./client.md)
 - [Server docs](./server.md)
-- [Migration guide]()
+- [Migration guide](./migration-guide.md)
