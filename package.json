@@ -9,10 +9,10 @@
   "license": "MIT",
   "nyc": {
     "check-coverage": true,
-    "lines": 100,
-    "statements": 100,
+    "branches": 100,
     "functions": 100,
-    "branches": 100
+    "lines": 100,
+    "statements": 100
   },
   "scripts": {
     "build": "buble -i client -o dist",

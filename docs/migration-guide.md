@@ -18,6 +18,7 @@ Steps to migrate your existing application are as follows:
 2. [Stop directly logging the `'action'` and `'error'` events](#2-stop-directly-logging-the-action-and-error-events)
 3. [Reorganize to use the new `handle` correctly](#3-reorganize-to-use-the-new-handle-correctly)
 4. [Decide how you want to auth](#4-decide-how-you-want-to-auth)
+5. [Instrument with `@articulate/sox-newrelic`](#5-instrument-with-articulatesox-newrelic)
 
 - - -
 
@@ -247,3 +248,7 @@ module.exports = tap(sockets)
 ```
 
 You may alternatively authenticate every action individually via composition, inspecting a `meta.jwt` or `meta.token` property each time.  In addition to the sweet savor of functional purity this would bring, it would also support the correct handling of authentication tokens which are periodically refreshed.  However, authenticating ever action would require changes to the frontend, and as this upgrade is intend to be backwards compatible with the frontend, I'll leave the implementation of this strategy as an exercise for the reader.
+
+#### 5. Instrument with `@articulate/sox-newrelic`
+
+Since the concept of "sox middleware" is no longer supported, then the previous method of instrumentation will no longer work.  If you would like to continue instrumenting with `New Relic`, then switch to using [`@articulate/sox-newrelic`](https://github.com/articulate/sox-newrelic), and follow the instructions provided.
