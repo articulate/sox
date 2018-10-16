@@ -10,7 +10,7 @@
 | [`logger`](#logger) | `a -> a` |
 | [`mount`](#mount) | `{ k: v } -> (Socket, Function) -> ()` |
 | [`overPayload`](#overpayload) | `(a -> Promise b) -> Action -> Promise Action` |
-| [`to`](#to) | `(Action -> String) -> Action -> Action` |
+| [`to`](#to) | `(Action -> String) -> Action -> Action`<br/>`Emitter -> (Action -> String) -> Action -> Action` |
 
 The type `Action` above refers to an [FSA-compliant](https://github.com/redux-utilities/flux-standard-action) action of the shape `{ type, payload, meta }`.
 
@@ -256,11 +256,12 @@ const app = handle({
 
 ```haskell
 to :: (Action -> String) -> Action -> Action
+to :: Emitter -> (Action -> String) -> Action -> Action
 ```
 
 Accepts a room function and an action.  The room function is used to translate the action into a room identifier.  An `'action'` event with the action is then [broadcast to all sockets in that room](http://devdocs.io/socketio/rooms-and-namespaces#rooms) (with the exception of the [`action.meta.socket`](#mount)).  Finally, the action is passed through.
 
-To broadcast to all sockets in a room from code outside the `sox` request/reponse cycle, set the `action.meta.socket` to a [`socket.io-emitter`](https://yarnpkg.com/en/package/socket.io-emitter).
+To broadcast to all sockets in a room from code outside the `sox` request/reponse cycle, pass an instance of [`socket.io-emitter`](https://yarnpkg.com/en/package/socket.io-emitter) as the first argument.
 
 See also [`join`](#join), [`leave`](#leave), [`mount`](#mount).
 
