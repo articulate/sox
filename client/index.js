@@ -22,7 +22,8 @@ const key = curry((type, payload) =>
 const sox = (args = {}) => {
   const {
     query = Function.prototype,
-    uri   = ''
+    uri   = '',
+    options = {}
   } = args
 
   const session = { session: cuid() }
@@ -35,7 +36,7 @@ const sox = (args = {}) => {
     query: merge(session, query())
   }
 
-  const socket = io(base, opts)
+  const socket = io(base, merge(options, opts))
 
   const connect = bind(socket.connect, socket)
 
