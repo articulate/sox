@@ -15,6 +15,17 @@ const debounce = require('./debounce')
 const throttle = require('./throttle')
 const toError  = require('./toError')
 
+const ALLOWED_OPTIONS = [
+  'randomizationFactor',
+  'reconnection',
+  'reconnectionAttempts',
+  'reconnectionDelay',
+  'reconnectionDelayMax',
+  'timeout',
+  'transports',
+  'upgrade'
+]
+
 const key = curry((type, payload) =>
   `${type}/${payload.id}`
 )
@@ -36,7 +47,8 @@ const sox = (args = {}) => {
     query: merge(session, query())
   }
 
-  const socket = io(base, merge(options, opts))
+  const getOptions = compose(merge(opts), pick(ALLOWED_OPTIONS))
+  const socket = io(base, getOptions(options))
 
   const connect = bind(socket.connect, socket)
 
