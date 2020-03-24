@@ -32,23 +32,23 @@ const key = curry((type, payload) =>
 
 const sox = (args = {}) => {
   const {
+    clientOptions = {},
     query = Function.prototype,
-    uri   = '',
-    options = {}
+    uri   = ''
   } = args
 
   const session = { session: cuid() }
   const url     = URL.parse(uri)
   const base    = URL.format(pick(['protocol', 'slashes', 'host'], url))
 
-  const opts = {
+  const options = {
     autoConnect: false,
     path: url.pathname,
     query: merge(session, query())
   }
 
-  const getOptions = compose(merge(opts), pick(ALLOWED_OPTIONS))
-  const socket = io(base, getOptions(options))
+  const extraOptions = pick(ALLOWED_OPTIONS, clientOptions)
+  const socket = io(base, merge(extraOptions, options))
 
   const connect = bind(socket.connect, socket)
 
