@@ -15,12 +15,24 @@ const debounce = require('./debounce')
 const throttle = require('./throttle')
 const toError  = require('./toError')
 
+const ALLOWED_OPTIONS = [
+  'randomizationFactor',
+  'reconnection',
+  'reconnectionAttempts',
+  'reconnectionDelay',
+  'reconnectionDelayMax',
+  'timeout',
+  'transports',
+  'upgrade'
+]
+
 const key = curry((type, payload) =>
   `${type}/${payload.id}`
 )
 
 const sox = (args = {}) => {
   const {
+    clientOptions = {},
     query = Function.prototype,
     uri   = ''
   } = args
@@ -29,13 +41,14 @@ const sox = (args = {}) => {
   const url     = URL.parse(uri)
   const base    = URL.format(pick(['protocol', 'slashes', 'host'], url))
 
-  const opts = {
+  const options = {
     autoConnect: false,
     path: url.pathname,
     query: merge(session, query())
   }
 
-  const socket = io(base, opts)
+  const extraOptions = pick(ALLOWED_OPTIONS, clientOptions)
+  const socket = io(base, merge(extraOptions, options))
 
   const connect = bind(socket.connect, socket)
 
