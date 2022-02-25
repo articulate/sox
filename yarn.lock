@@ -8,9 +8,10 @@
   dependencies:
     crocks "^0.7.0"
 
-"@articulate/funky@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@articulate/funky/-/funky-1.0.1.tgz#f54c6d18d259a091b85cafdde4229f2b50ca4547"
+"@articulate/funky@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@articulate/funky/-/funky-2.0.0.tgz#462791050461125f3dc5d2a45e46e70d272a9bd0"
+  integrity sha512-lwMJC6rgPs3UTn/0GCsW1Dg74OngU74phVBMgzd2njgALeMsmIuGMjFCPlVttjmaUzRd3xI24p0UOVFZcH8IbQ==
   dependencies:
     ramda "^0.25.0"
 
