@@ -1,6 +1,6 @@
 {
   "name": "@articulate/sox",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Our super-special sockets stuff",
   "browser": "dist/index.js",
   "main": "server/index.js",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@articulate/ducks": "^0.1.0",
-    "@articulate/funky": "^1.0.1",
+    "@articulate/funky": "^2.0.0",
     "boom": "^7.2.0",
     "crocks": "^0.10.1",
     "cuid": "^2.1.1",
