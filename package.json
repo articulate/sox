@@ -34,7 +34,7 @@
     "crocks": "^0.10.1",
     "cuid": "^2.1.1",
     "ramda": "^0.25.0",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^4.5.2"
   },
   "devDependencies": {
     "@articulate/spy": "^0.0.1",
