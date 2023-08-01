@@ -1,6 +1,6 @@
 {
   "name": "@articulate/sox",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Our super-special sockets stuff",
   "browser": "dist/index.js",
   "main": "server/index.js",
@@ -34,7 +34,7 @@
     "crocks": "^0.10.1",
     "cuid": "^2.1.1",
     "ramda": "^0.25.0",
-    "socket.io-client": "^4.5.2"
+    "socket.io-client": "^4.7.1"
   },
   "devDependencies": {
     "@articulate/spy": "^0.0.1",
