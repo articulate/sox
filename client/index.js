@@ -23,7 +23,8 @@ const ALLOWED_OPTIONS = [
   'reconnectionDelayMax',
   'timeout',
   'transports',
-  'upgrade'
+  'upgrade',
+  'withCredentials',
 ]
 
 const key = curry((type, payload) =>
