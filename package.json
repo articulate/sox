@@ -21,6 +21,7 @@
     "lint": "eslint client server test",
     "postversion": "git push --tags origin master",
     "prebuild": "yarn run clean",
+    "prepack": "yarn run build",
     "pretest": "yarn run build",
     "preversion": "git checkout master && yarn run build",
     "test": "mocha test --reporter=dot",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "@articulate/spy": "^0.0.1",
+    "@changesets/cli": "^2.27.9",
     "buble": "^0.18.0",
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
