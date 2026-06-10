@@ -1,5 +1,5 @@
 const { action }   = require('@articulate/ducks')
-const Boom         = require('boom')
+const Boom         = require('@hapi/boom')
 const { expect }   = require('chai')
 const property     = require('prop-factory')
 const spy          = require('@articulate/spy')
