@@ -1,4 +1,4 @@
-const { boomify, badRequest } = require('boom')
+const { boomify, badRequest } = require('@hapi/boom')
 const { converge, identity, pipe, prop, unless, when } = require('ramda')
 
 const formatError = err => {
